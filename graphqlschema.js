@@ -35,6 +35,8 @@ const schema = buildSchema(`
 
   type Mutation {
     createFlashcard(input: FlashcardInput): Flashcard
+    updateFlashcard(id: Int!, input: FlashcardInput): Flashcard
+    deleteFlashcard(id: Int!): String
   }
 
 `)
@@ -64,6 +66,24 @@ const root = {
     } catch (err) {
       console.warn(err)
       throw new Error('had a problem with creating a flashcard')
+    }
+  },
+  updateFlashcard: async function({ id, input }) {
+    try {
+      const flashcardToModify = new Flashcard(await Flashcard.findOne(id))
+      return await flashcardToModify.update(input)
+    } catch (err) {
+      console.warn(err)
+      throw new Error('had a problem with updating a flashcard')
+    }
+  },
+  deleteFlashcard: async function({ id }) {
+    try {
+      await Flashcard.destroy(id)
+      return 'Deleted successfully'
+    } catch(err) {
+      console.warn(err)
+      throw new Error('had a problem deleting a flashcard')
     }
   }
 }
