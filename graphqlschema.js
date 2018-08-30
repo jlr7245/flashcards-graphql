@@ -19,12 +19,24 @@ const schema = buildSchema(`
     keywords: [Keyword]
   }
 
+  input FlashcardInput {
+    question: String
+    answer: String
+    category: String
+    difficulty: Int
+  }
+
   type Query {
     getAllFlashcards: [Flashcard]
     getFlashcard(id: Int!): Flashcard
     getAllKeywords: [Keyword]
     getKeyword(id: Int!): Keyword
   }
+
+  type Mutation {
+    createFlashcard(input: FlashcardInput): Flashcard
+  }
+
 `)
 
 const root = {
@@ -41,6 +53,18 @@ const root = {
   },
   getKeyword: async function({ id }) {
     return new Keyword(await Keyword.findOne(id))
+  },
+  createFlashcard: async function({ input }) {
+    try {
+      const newFlashcard = await new Flashcard(input).save()
+      const keywords = await newFlashcard.getKeywords()
+      const newKeywords = await Keyword.upsertSeveral(keywords)
+      await newFlashcard.relateKeywords(newKeywords)
+      return newFlashcard
+    } catch (err) {
+      console.warn(err)
+      throw new Error('had a problem with creating a flashcard')
+    }
   }
 }
 

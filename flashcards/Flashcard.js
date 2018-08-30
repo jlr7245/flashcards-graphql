@@ -1,6 +1,8 @@
 const db = require('../db/config')
 const { modelUtils, modelStatics } = require('../utils')
 const schema = require('./FlashcardSchema')
+require('dotenv').config()
+require('isomorphic-fetch')
 
 function Flashcard({ id = null, question, answer, category, difficulty, user_id }) {
   this.id = this._validate(id, 'id')
@@ -64,6 +66,26 @@ Flashcard.prototype.keywords = async function() {
           ON flashcards.id = flashcards_keywords.fc_id
     WHERE flashcards.id = $/id/`, this)
   return keywords.map(keyword => new Keyword(keyword))
+}
+
+Flashcard.prototype.getKeywords = async function() {
+  try {
+    const initialRes = await fetch('https://apiv2.indico.io/keywords?version=2', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        api_key: process.env.API_KEY,
+        data: this.question
+      })
+    })
+    const { results } = await initialRes.json()
+    return Object.keys(results)
+  } catch(err) {
+    console.warn(err)
+    throw new Error('error when trying to get keywords')
+  }
 }
 
 Flashcard.prototype.relateKeywords = function(keywords) {
