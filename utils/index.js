@@ -18,7 +18,7 @@ const modelUtils = schema => {
       if (value && regexp && !value.match(regexp)) throw new Error(
         `${value} not valid for ${key}. ${regexpMessage}`
       )
-      if (value && otherCondition && !otherCondition(val)) throw new Error(
+      if (value && otherCondition && !otherCondition(value)) throw new Error(
         `${value} not valid for ${key}. ${otherConditionMessage}`
       ) 
       return value

@@ -35,11 +35,11 @@ Flashcard.prototype.save = function() {
     VALUES ($/question/, $/answer/, $/difficulty/, $/category/, $/user_id/)
     RETURNING *
   `, this)
-    .then(flashcard => this.modify(flashcard))
+    .then(flashcard => this._modify(flashcard))
 }
 
 Flashcard.prototype.update = function(changes) {
-  this.modify(changes);
+  this._modify(changes);
   return db.one(`
     UPDATE flashcards SET
     question = $/question/,
@@ -49,7 +49,7 @@ Flashcard.prototype.update = function(changes) {
     WHERE id = $/id/
     RETURNING *
   `, this)
-    .then(flashcard => this.modify(flashcard))
+    .then(flashcard => this._modify(flashcard))
 }
 
 Flashcard.prototype.keywords = function() {

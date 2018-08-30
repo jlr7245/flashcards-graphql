@@ -15,7 +15,7 @@ keywordStatics.upsertSeveral = keywords => (
       t.one(`
         INSERT INTO keywords
         (word, counter)
-        VALUES $1, 1
+        VALUES ($1, 1)
         ON CONFLICT (word) DO UPDATE
         SET counter = keywords.counter + 1
         RETURNING *

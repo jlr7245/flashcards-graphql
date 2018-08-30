@@ -25,7 +25,7 @@ Quiz.prototype.save = function() {
     VALUES ($/name/, $/description/, $/public/, $/user_id/)
     RETURNING *
   `, this)
-  .then(quiz => this.modify(quiz))
+  .then(quiz => this._modify(quiz))
 }
 
 Quiz.prototype.relateFlashcards = function(flashcards) {
