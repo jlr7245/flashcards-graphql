@@ -11,6 +11,7 @@ function Flashcard({ id = null, question, answer, category, difficulty, user_id 
   this.user_id = this._validate(user_id, 'user_id')
 }
 
+
 // static methods (Flashcard.thing)
 const flashcardStatics = modelStatics(db, 'flashcards')
 flashcardStatics.findByCategory = (category) => {
@@ -20,7 +21,6 @@ flashcardStatics.findByCategory = (category) => {
   `, category)
 }
 Object.setPrototypeOf(Flashcard, flashcardStatics)
-
 
 // instance methods (new Flashcard.thing)
 Flashcard.prototype = Object.assign(
@@ -52,19 +52,18 @@ Flashcard.prototype.update = function(changes) {
     .then(flashcard => this._modify(flashcard))
 }
 
-Flashcard.prototype.keywords = function() {
-  return db.manyOrNone(
+Flashcard.prototype.keywords = async function() {
+  const Keyword = require('../keywords/Keyword')
+
+  const keywords = await db.manyOrNone(
     `SELECT keywords.*
     FROM keywords
     JOIN flashcards_keywords
           ON flashcards_keywords.kw_id = keywords.id
     JOIN flashcards
           ON flashcards.id = flashcards_keywords.fc_id
-   WHERE flashcards.id = $/id/`, this)
-    .then(keywords => {
-      this.words = keywords
-      return this
-    })
+    WHERE flashcards.id = $/id/`, this)
+  return keywords.map(keyword => new Keyword(keyword))
 }
 
 Flashcard.prototype.relateKeywords = function(keywords) {

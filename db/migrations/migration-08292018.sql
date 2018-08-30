@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS flashcards (
   question TEXT,
   answer TEXT,
   category VARCHAR(255),
-  difficulty BIGINT
+  difficulty INTEGER
 );
 
 CREATE INDEX idx_category ON flashcards (category);

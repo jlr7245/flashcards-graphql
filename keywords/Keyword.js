@@ -25,8 +25,11 @@ keywordStatics.upsertSeveral = keywords => (
 )
 Object.setPrototypeOf(Keyword, keywordStatics)
 
-Keyword.prototype.flashcards = function() {
-  return db.manyOrNone(`
+Keyword.prototype = Object.assign(Keyword.prototype, modelUtils(schema))
+Keyword.prototype.flashcards = async function() {
+  const Flashcard = require('../flashcards/Flashcard')
+
+  const flashcards = await db.manyOrNone(`
     SELECT flashcards.*
       FROM flashcards
       JOIN flashcards_keywords
@@ -35,7 +38,7 @@ Keyword.prototype.flashcards = function() {
         ON keywords.id = flashcards_keywords.kw_id
     WHERE keywords.id = $1
   `, this.id)
-  .then(flashcards => ({ ...this, cards: flashcards }))
+  return flashcards.map(flashcard => new Flashcard(flashcard))
 }
 
 module.exports = Keyword
