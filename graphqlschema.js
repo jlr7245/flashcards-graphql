@@ -43,18 +43,38 @@ const schema = buildSchema(`
 
 const root = {
   getFlashcard: async function({ id }) {
-    return new Flashcard(await Flashcard.findOne(id))
+    try {
+      return new Flashcard(await Flashcard.findOne(id))
+    } catch(err) {
+      console.warn(err)
+      throw new Error('had a problem finding a flashcard')
+    }
   },
   getAllFlashcards: async function() {
-    const allFlashcards = await Flashcard.findAll()
-    return allFlashcards.map(flashcard => new Flashcard(flashcard))
+    try {
+      const allFlashcards = await Flashcard.findAll()
+      return allFlashcards.map(flashcard => new Flashcard(flashcard))
+    } catch (error) {
+      console.warn(error)
+      throw new Error('had a problem getting all flashcards')
+    }
   },
   getAllKeywords: async function() {
-    const allKeywords = await Keyword.findAll()
-    return allKeywords.map(keyword => new Keyword(keyword))
+    try {
+      const allKeywords = await Keyword.findAll()
+      return allKeywords.map(keyword => new Keyword(keyword))
+    } catch (error) {
+      console.warn(error)
+      throw new Error('had a problem getting all keywords')
+    }
   },
   getKeyword: async function({ id }) {
-    return new Keyword(await Keyword.findOne(id))
+    try {
+      return new Keyword(await Keyword.findOne(id))
+    } catch (error) {
+      console.warn(err)
+      throw new Error('had a problem getting a keyword')
+    }
   },
   createFlashcard: async function({ input }) {
     try {
