@@ -1,6 +1,6 @@
 const { buildSchema } = require('graphql')
-const Flashcard = require('../flashcards/Flashcard')
-const Keyword = require('../keywords/Keyword')
+const { protected: fcProtected } = require('./resolvers/flashcards')
+
 const {
   flashcardType,
   keywordType,
@@ -43,36 +43,7 @@ const root = {
   hello: function() {
     return 'Hello World'
   },
-  createFlashcard: async function({ input }) {
-    try {
-      const newFlashcard = await new Flashcard(input).save()
-      const keywords = await newFlashcard.getKeywords()
-      const newKeywords = await Keyword.upsertSeveral(keywords)
-      await newFlashcard.relateKeywords(newKeywords)
-      return newFlashcard
-    } catch (err) {
-      console.warn(err)
-      throw new Error('had a problem with creating a flashcard')
-    }
-  },
-  updateFlashcard: async function({ id, input }) {
-    try {
-      const flashcardToModify = new Flashcard(await Flashcard.findOne(id))
-      return await flashcardToModify.update(input)
-    } catch (err) {
-      console.warn(err)
-      throw new Error('had a problem with updating a flashcard')
-    }
-  },
-  deleteFlashcard: async function({ id }) {
-    try {
-      await Flashcard.destroy(id)
-      return 'Deleted successfully'
-    } catch(err) {
-      console.warn(err)
-      throw new Error('had a problem deleting a flashcard')
-    }
-  }
+  ...fcProtected
 }
 
 module.exports = { schema, root }
