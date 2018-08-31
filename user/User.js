@@ -32,4 +32,15 @@ User.prototype.save = function() {
   .then(user => this._modify(user))
 }
 
+User.prototype.flashcards = async function() {
+  const Flashcard = require('../flashcards/Flashcard')
+
+  const flashcards = await db.manyOrNone(`
+    SELECT * FROM flashcards
+    WHERE user_id = $/id/
+    ORDER BY id ASC
+  `)
+  return flashcards.map(flashcard => new Flashcard(flashcard))
+}
+
 module.exports = User

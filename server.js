@@ -3,9 +3,10 @@ const graphqlHTTP = require('express-graphql')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const passport = require('passport')
-// const { schema, root } = require('./graphqlschema')
 const protected = require('./schema/protected')
 const public = require('./schema/public')
+
+require('dotenv').config()
 
 const PORT = process.env.PORT || 4000
 
@@ -22,25 +23,19 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-// app.use('/graphql', graphqlHTTP({
-//   schema,
-//   rootValue: root,
-//   graphiql: true
-// }))
-
-
-
-app.use('/public', graphqlHTTP({
+app.use('/public', graphqlHTTP((req, res) => ({
   schema: public.schema,
   rootValue: public.root,
-  graphiql: true
-}))
+  graphiql: true,
+  context: { req, res }
+})))
 
-app.use('/protected', graphqlHTTP({
+app.use('/protected', passport.authenticate('local'), graphqlHTTP((req, res) => ({
   schema: protected.schema,
   rootValue: protected.root,
-  graphiql: true
-}))
+  graphiql: true,
+  ctx: { req, res }
+})))
 
 app.use('/', (req, res) => {
   res.send('Hello World')

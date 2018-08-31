@@ -1,6 +1,7 @@
 const { buildSchema } = require('graphql')
 const { public: fcPublic } = require('./resolvers/flashcards')
 const { public: kwPublic } = require('./resolvers/keywords')
+const { public: userPublic } = require('./resolvers/users')
 
 const {
   flashcardType,
@@ -21,6 +22,11 @@ const schema = buildSchema(`
     email: String
   }
 
+  input UserLogin {
+    username: String
+    password: String
+  }
+
   type Query {
     getAllFlashcards: [Flashcard]
     getFlashcard(id: Int!): Flashcard
@@ -29,13 +35,15 @@ const schema = buildSchema(`
   }
 
   type Mutation {
-    createUser(input: UserInput): User
+    register(input: UserInput): User
+    login(input: UserLogin): User
   }
 `)
 
 const root = {
   ...fcPublic,
-  ...kwPublic
+  ...kwPublic,
+  ...userPublic
 }
 
 module.exports = { schema, root }
